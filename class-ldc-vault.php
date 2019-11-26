@@ -1,18 +1,4 @@
 <?php
-/**
- * Author: Luis del Cid
- * Author URI: https://luisdelcid.com
- * Description: A collection of useful functions for your WordPress theme's functions.php.
- * Domain Path:
- * License: GPL2
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Network:
- * Plugin Name: LDC Vault
- * Plugin URI: https://luisdelcid.com
- * Text Domain: ldc-vault
- * Version: 2019.11.26
- *
- */
 
  // --------------------------------------------------
 
