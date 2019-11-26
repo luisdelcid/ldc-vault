@@ -280,6 +280,7 @@
 		}
 		$args = apply_filters(self::$prefix . 'query_args', $args, $this->post_id);
 		$posts = get_posts($args);
+		$posts = apply_filters(self::$prefix . 'posts', $posts, $this->post_id);
 		if($posts){
 			if($this->bootstrap_version){
 				$html .= '<div class="table-responsive">';
