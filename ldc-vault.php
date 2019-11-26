@@ -10,7 +10,7 @@
  * Plugin Name: LDC Vault
  * Plugin URI: https://luisdelcid.com
  * Text Domain: ldc-vault
- * Version: 2019.11.26.3
+ * Version: 2019.11.26.4
  *
  */ // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -31,7 +31,7 @@
 			deactivate_plugins(plugin_basename(__FILE__));
 		} else {
             define('LDC_Vault', __FILE__);
-			define('LDC_Vault_Version', '2019.11.26.3');
+			define('LDC_Vault_Version', '2019.11.26.4');
 			require_once(plugin_dir_path(LDC_Vault) . 'class-ldc-vault.php');
             require_once(plugin_dir_path(LDC_Vault) . 'functions.php');
         }

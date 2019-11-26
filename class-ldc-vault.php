@@ -258,11 +258,13 @@
  // --------------------------------------------------
 
 	public function render_data_table(){
-		$html = '<h2>' . get_the_title($this->post_id) . '</h2>';
+		$html = '<div class="' . $this->container_class . '">';
+		$html .= '<h2>' . get_the_title($this->post_id) . '</h2>';
 		$args = array(
 			'post_status' => 'any',
 			'post_type' => $this->post_type,
 			'posts_per_page' => -1,
+			'order' => 'DESC',
 		);
 		if($this->meta_compare != '='){
 			$args['meta_compare'] = $this->meta_compare;
@@ -279,7 +281,6 @@
 		$args = apply_filters(self::$prefix . 'query_args', $args, $this->post_id);
 		$posts = get_posts($args);
 		if($posts){
-			$html .= '<div class="' . $this->container_class . '">';
 			if($this->bootstrap_version){
 				$html .= '<div class="table-responsive">';
 				$html .= '<table id="' . self::$prefix . 'data_table" class="table table-striped table-bordered table-hover">';
@@ -289,6 +290,7 @@
 			}
 			$html .= '<thead>';
 			$html .= '<tr>';
+			$html .= '<th>#</th>';
 			if($this->fields){
 				foreach($this->fields as $key){
 					$key = apply_filters(self::$prefix . 'field_key', $key, $this->post_id);
@@ -308,8 +310,22 @@
 			$html .= '</tr>';
 			$html .= '</thead>';
 			$html .= '<tbody>';
+			$order = 'DESC';
+			if(!empty($args['order'])){
+				if($args['order'] == 'ASC'){
+					$order = 'ASC';
+				}
+			}
+			if($order == 'DESC'){
+				$c = count($posts);
+			} else {
+				$c = 1;
+			}
 			foreach($posts as $post){
 				$html .= '<tr>';
+				$html .= '<td>';
+				$html .= $c;
+				$html .= '</td>';
 				if($this->fields){
 					foreach($this->fields as $key){
 						$value = $post->$key;
@@ -334,12 +350,17 @@
 					}
 				}
 				$html .= '</tr>';
+				if($order == 'DESC'){
+					$c --;
+				} else {
+					$c ++;
+				}
 			}
 			$html .= '</tbody>';
 			$html .= '</table>';
 			$html .= '</div>';
-			$html .= '</div>';
 		}
+		$html .= '</div>';
 		return $html;
 	}
 
