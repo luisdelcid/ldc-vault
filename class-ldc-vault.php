@@ -73,6 +73,10 @@
 				$meta_fields[$meta_field] = $meta_field;
 			}
 		}
+		$meta_compare = array('=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'NOT EXISTS', 'REGEXP', 'NOT REGEXP', 'RLIKE');
+		$meta_compare = array_combine($meta_compare, $meta_compare);
+		$meta_type = array('NUMERIC', 'BINARY', 'CHAR', 'DATE', 'DATETIME', 'DECIMAL', 'SIGNED', 'TIME', 'UNSIGNED');
+		$meta_type = array_combine($meta_type, $meta_type);
 		$meta_boxes[] = array(
 			'fields' => array(
 				array(
@@ -105,6 +109,41 @@
 					'options' => $meta_fields,
 					'type' => 'select_advanced',
 				),
+				array(
+					'type' => 'divider',
+				),
+				array(
+					'id' => self::$prefix . 'container_class',
+					'name' => 'Container class',
+					'type' => 'text',
+				),
+				array(
+					'type' => 'divider',
+				),
+				array(
+					'id' => self::$prefix . 'meta_key',
+					'name' => 'Custom field key',
+					'type' => 'text',
+				),
+				array(
+					'id' => self::$prefix . 'meta_value',
+					'name' => 'Custom field value',
+					'type' => 'text',
+				),
+				array(
+					'id' => self::$prefix . 'meta_compare',
+					'name' => 'Operator to test',
+					'options' => $meta_compare,
+					'type' => 'select_advanced',
+					'std' => '=',
+				),
+				array(
+					'id' => self::$prefix . 'meta_type',
+					'name' => 'Custom field type',
+					'options' => $meta_type,
+					'type' => 'select_advanced',
+					'std' => 'CHAR',
+				),
 			),
 			'id' => self::$prefix . 'meta_box',
 			'post_types' => self::$custom_post_type,
@@ -129,7 +168,7 @@
  //
  // --------------------------------------------------
 
-	private $bootstrap_version = 0, $fields = array(), $footer = '', $header = '', $meta_fields = array(), $options = array(), $post_id = 0, $post_type = '';
+	private $bootstrap_version = 0, $fields = array(), $footer = '', $header = '', $meta_compare = '=', $meta_fields = array(), $meta_key = '', $meta_type = 'CHAR', $meta_value = '', $options = array(), $post_id = 0, $post_type = '';
 
  // --------------------------------------------------
 
@@ -170,6 +209,10 @@
 		if(!post_type_exists($this->post_type)){
 			wp_die(__('Invalid post type.'), self::$name);
 		}
+		$this->meta_compare = get_post_meta($post_id, self::$prefix . 'meta_compare', true);
+		$this->meta_key = get_post_meta($post_id, self::$prefix . 'meta_key', true);
+		$this->meta_type = get_post_meta($post_id, self::$prefix . 'meta_type', true);
+		$this->meta_value = get_post_meta($post_id, self::$prefix . 'meta_value', true);
 	}
 
  // --------------------------------------------------
@@ -220,6 +263,18 @@
 			'post_type' => $this->post_type,
 			'posts_per_page' => -1,
 		);
+		if($this->meta_compare != '='){
+			$args['meta_compare'] = $this->meta_compare;
+		}
+		if($this->meta_key){
+			$args['meta_key'] = $this->meta_key;
+		}
+		if($this->meta_value){
+			$args['meta_value'] = $this->meta_value;
+		}
+		if($this->meta_type != 'CHAR'){
+			$args['meta_type'] = $this->meta_type;
+		}
 		$args = apply_filters(self::$prefix . 'query_args', $args, $this->post_id);
 		$posts = get_posts($args);
 		if($posts){
