@@ -168,7 +168,7 @@
  //
  // --------------------------------------------------
 
-	private $bootstrap_version = 0, $fields = array(), $footer = '', $header = '', $meta_compare = '=', $meta_fields = array(), $meta_key = '', $meta_type = 'CHAR', $meta_value = '', $options = array(), $post_id = 0, $post_type = '';
+	private $bootstrap_version = 0, $container_class = '', $fields = array(), $footer = '', $header = '', $meta_compare = '=', $meta_fields = array(), $meta_key = '', $meta_type = 'CHAR', $meta_value = '', $options = array(), $post_id = 0, $post_type = '';
 
  // --------------------------------------------------
 
@@ -209,6 +209,7 @@
 		if(!post_type_exists($this->post_type)){
 			wp_die(__('Invalid post type.'), self::$name);
 		}
+		$this->container_class = get_post_meta($post_id, self::$prefix . 'container_class', true);
 		$this->meta_compare = get_post_meta($post_id, self::$prefix . 'meta_compare', true);
 		$this->meta_key = get_post_meta($post_id, self::$prefix . 'meta_key', true);
 		$this->meta_type = get_post_meta($post_id, self::$prefix . 'meta_type', true);
@@ -222,7 +223,7 @@
 		$options = $this->options;
 		add_action('wp_enqueue_scripts', function() use($bootstrap_version, $options){
 			wp_enqueue_script('data-tables', 'https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js', array('jquery'), '1.10.20');
-			$inline_script = 'jQuery(function($){ $("#ldc-vault-data-table").DataTable(' . wp_json_encode($options) . '); });';
+			$inline_script = 'jQuery(function($){ $("#' . self::$prefix . 'data_table").DataTable(' . wp_json_encode($options) . '); });';
 			switch($bootstrap_version){
 				case 0:
 					wp_add_inline_script('data-tables', $inline_script);
@@ -278,12 +279,13 @@
 		$args = apply_filters(self::$prefix . 'query_args', $args, $this->post_id);
 		$posts = get_posts($args);
 		if($posts){
+			$html .= '<div class="' . $this->container_class . '">';
 			if($this->bootstrap_version){
 				$html .= '<div class="table-responsive">';
-				$html .= '<table id="ldc-vault-data-table" class="table table-striped table-bordered table-hover">';
+				$html .= '<table id="' . self::$prefix . 'data_table" class="table table-striped table-bordered table-hover">';
 			} else {
 				$html = '<div>';
-				$html .= '<table id="ldc-vault-data-table">';
+				$html .= '<table id="' . self::$prefix . 'data_table">';
 			}
 			$html .= '<thead>';
 			$html .= '<tr>';
@@ -335,6 +337,7 @@
 			}
 			$html .= '</tbody>';
 			$html .= '</table>';
+			$html .= '</div>';
 			$html .= '</div>';
 		}
 		return $html;
