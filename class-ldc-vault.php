@@ -14,7 +14,7 @@
 
  // --------------------------------------------------
 
-	public static function init_action(){
+	private static function register_post_types(){
 		if(current_user_can('manage_options')){
 			register_post_type(self::$custom_post_type, array(
 				'labels' => array(
@@ -33,10 +33,24 @@
 
  // --------------------------------------------------
 
+	public static function activation_action(){
+		self::register_post_types();
+		flush_rewrite_rules();
+	}
+
+ // --------------------------------------------------
+
+	public static function init_action(){
+		self::register_post_types();
+	}
+
+ // --------------------------------------------------
+
 	public static function setup(){
 		self::$name = str_replace('_', ' ', __CLASS__);
 		self::$prefix = strtolower(__CLASS__) . '_';
 		self::$custom_post_type = self::$prefix . 'post';
+		register_activation_hook(__FILE__, array(__CLASS__, 'activation_action'));
 		add_action('init', array(__CLASS__, 'init_action'));
 		add_filter('template_include', array(__CLASS__, 'template_include_filter'));
 		add_filter('rwmb_meta_boxes', array(__CLASS__, 'rwmb_meta_boxes_filter'));
